@@ -153,8 +153,6 @@ app.post("/user/todo",async(req,res)=>{
 })
 
 
-
-
 //----------------create todo -------------------
 
 app.post("/create/todo",async(req,res)=>{
