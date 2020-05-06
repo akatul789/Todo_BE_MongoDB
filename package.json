@@ -1,5 +1,5 @@
 {
-  "name": " To_do project mongodb",
+  "name": "Todo_mongoDB",
   "version": "1.0.0",
   "description": "To_do project backend using mongodb",
   "main": "app.js",
