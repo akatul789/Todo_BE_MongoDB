@@ -210,20 +210,20 @@ app.post("/create/todo",async(req,res)=>{
 
 //----------------------delete todo--------------------------
 
-app.post('/delete/todo', (req,res) => {
+app.post('/delete/todo',async (req,res) => {
 	console.log("delete todo api");
 
-	Todo.findByIdAndDelete(req.body.tid).exec((err,todo)=> {
+	await Todo.findByIdAndDelete(req.body.tid).exec((err,todo)=> {
 		if(err)
 		{
-			res.status(400).send("err adding user");
+			res.status(400).send("err deleting user");
 		}
 		else
 		{
 			res.status(200).json({
 					success : true,
 					message : "todo deleted from DB",
-					todo_deleted : todo
+					deleted_todo : todo
 				});
 		}
 
@@ -232,7 +232,7 @@ app.post('/delete/todo', (req,res) => {
 })
 
 
-//--------------------update todo ------------------------------
+//--------------------Update todo ------------------------------
 
 app.post('/update/todo', async(req,res) => {
 	console.log("## update api called");
@@ -264,17 +264,34 @@ app.post('/update/todo', async(req,res) => {
 
 
 
-// Test api ----
-app.get("/",(req,res)=>{
-	res.send('<h1>Test API Working ! LOL<h1>')
+//---------------profile details api ------------------
+
+app.post("/profile_det",async(req,res)=>{
+	try{
+		await User.findOne({_id : req.body.uid}).exec((err,user)=> {
+			if(err)
+			{
+				res.status(400).send("Error.. cannot find user");
+			}
+			else
+			{
+				res.status(200).json(user);
+			}
+		});
+	}
+	catch(error){
+		res.status(500)
+	}
 })
 
-
+// Test api ----
+app.get("/",(req,res)=>{
+	res.send('<h1>Test API Working ! <h1><br><h2>LOL<h2>')
+})
 
 
 // Port no. -----
 const port = 3000;
-
 
 // -------------------------------------
 app.listen(port, () => {
