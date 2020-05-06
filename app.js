@@ -18,7 +18,11 @@ app.use(cors());
 
 // ###### DB connection ----------------
 
+// ## localhost-----
 require("./model/localDB")
+
+// ## Mongodb atlas--------
+// require("./model/cloudDB")
 
 
 // importing models
