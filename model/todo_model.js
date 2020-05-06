@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 
+var Schema = mongoose.Schema;
 
-var todoschema = new mongoose.Schema({
-	tid:{
-		type : String
-	},
+var todoschema = new Schema({
+	_id : Schema.Types.ObjectId,
 	title : {
 		type : String
 	},
@@ -12,9 +11,15 @@ var todoschema = new mongoose.Schema({
 		type : String
 	},
 	status : {
-		type : String
+		type : Boolean,
+		default : false
+	},
+	user : {
+		required : true,
+		type: Schema.Types.ObjectId,
+		ref: 'UserData'
 	}
 });
 
-mongoose.model('Todo',todoschema);
+module.exports = mongoose.model('TodoData',todoschema);
 

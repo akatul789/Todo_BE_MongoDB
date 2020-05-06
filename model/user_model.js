@@ -1,13 +1,21 @@
 const mongoose = require('mongoose');
 
+var Schema = mongoose.Schema;
 
-var userschema = new mongoose.Schema({
-	uid:{
-		type : String
+var userschema = new Schema({
+
+	_id: {
+		type: Schema.Types.ObjectId
 	},
 	name : {
 		type : String,
-		required : true
+		required : true,
+		validate : {
+			validator : function(text) {
+				return text.length >0;
+			},
+			message : "empty name not allowed"
+		}
 	},
 	email : {
 		type : String,
@@ -15,20 +23,8 @@ var userschema = new mongoose.Schema({
 	},
 	profile_pic : {
 		type : String
-	},
-	todos : [
-			{tid : 
-				{type : String}
-			},
-			{title : {type : String}
-			},
-			{description : {	type : String}
-			},
-			{status : {type : Boolean}
-			},
-			{deleted : {type : Boolean}
-			}
-	] 
+	}
+
 });
 
 module.exports = mongoose.model('UserData',userschema);

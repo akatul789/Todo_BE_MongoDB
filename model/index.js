@@ -22,17 +22,21 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://localhost:27017/crud',
+mongoose.connect('mongodb://localhost:27017/test1',
 	{
 	useNewUrlParser :true,
-	useUnifiedTopology:true
-},(error,db)=>{
-	if(!error)
+	useUnifiedTopology:true,
+	useFindAndModify : false
+},(err)=>{
+	if(!err)
 	{
 		console.log("  ###  MongoDB Connected !!!");
 	}
 	else
 	{
-		console.log(" # Error connection DB - "+error);
+		console.log(" # Error connection DB - "+err);
 	}
 });
+
+// const User = require("./user_model");
+// const Todo = require("./todo_model");

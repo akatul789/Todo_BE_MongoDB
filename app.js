@@ -1,81 +1,42 @@
-const express = require('express');
-const path = require("path");
+var express = require('express');
+var path = require("path");
 const expressHandlers = require("express-handlebars");
-const bodyparser = require("body-parser");
+var bodyparser = require("body-parser");
 const cors = require('cors');
 
 
-// const morgan = require("morgan");
+var mongoose = require('mongoose');
 
-const mongoose = require('mongoose');
-
-const app = express();
+var app = express();
 
 app.use(bodyparser.json());
 
 app.use(bodyparser.urlencoded({ extended: false }));
+
+// app.use(bodyparser.urlencoded({ extended: true}));
+
 app.use(cors());
 
 // DB connect
-require("./model/fetch")
+require("./model/index")
 
+var Todo = require('./model/todo_model');
+var User = require('./model/user_model');
 //models
 // require("./model/Post")
 
-require("./model/user_model");
+// require("./model/user_model");
 
 
 
-const UserD = mongoose.model("UserData");
+// const UserD = mongoose.model("UserData");
+// const TodoD = mongoose.model("TodoData");
 // const Post = mongoose.model("Post");
 
-app.get("/posts",async(req,res)=>{
-	try{
-		const posts = await Post.find({})
-		res.send(posts)
-
-	}
-	catch(error){
-		res.status(500)
-	}
-})
-
-
-//-------------------------------------------------------
-
-app.get("/users",async(req,res)=>{
-	try{
-		const users = await UserD.find({})
-		res.send(users)
-
-	}
-	catch(error){
-		res.status(500)
-	}
-})
-
-
-// find all
-app.get("/users/:uidd",async(req,res)=>{
-	try{
-		const users = await UserD.find({ uid : req.params.uidd})
-		res.send(users);
-
-
-	}
-	catch(error){
-		res.status(500)
-	}
-})
-
-
-
-// find one
-// app.get("/users/:uidd",async(req,res)=>{
+// app.get("/posts",async(req,res)=>{
 // 	try{
-// 		const users = await UserD.findOne({ uid : req.params.uidd})
-// 		res.send(users);
-
+// 		const posts = await Post.find({})
+// 		res.send(posts)
 
 // 	}
 // 	catch(error){
@@ -83,30 +44,127 @@ app.get("/users/:uidd",async(req,res)=>{
 // 	}
 // })
 
-// insert values 
 
-app.post("/users",async(req,res)=>{
+
+//--------------------Create user API ------------------------
+
+app.post("/create/user",async(req,res)=>{
 	try{
-		const user = new UserD();
-		user.uid = req.body.uid;
-		user.name =req.body.name;
-		user.email = req.body.email;
-		user.profile_pic = req.body.pp;
-		
-		var todo=[];
-		obj={
-		tid : req.body.tid,
-		title : req.body.title,
-		description : req.body.des
-	}
-	
-	todo.push(obj);
-	console.log(todo);
-	user.todos=todo;
-		// user.todos.push(tid:'2',title:'als');
-		// await user.save();
-		res.send(user)
+		console.log(" ## Create user API called");
 
+		var userobj = {
+			"_id" : new mongoose.Types.ObjectId(),
+			"name" : req.body.name,
+			"email" : req.body.email,
+			"profile_pic" : req.body.pp
+		}
+
+
+		var newUser = new User(userobj);
+
+		console.log(userobj);
+
+		await newUser.save((err, user) => {
+			if(err)
+			{
+				res.status(400).send("Error adding user");
+			}
+			else
+			{
+				console.log("  ## User Added !");
+				res.status(200).json({
+					success : true,
+					message : "user added to DB",
+					user_det : user
+				});
+			}
+		})
+
+	}
+	catch(error){
+		res.status(500)
+	}
+});
+
+//-----------------------View users-----------------------------
+
+app.get("/users",async(req,res)=>{
+	try{
+		await User.find({}).exec((err,users)=> {
+			if(err)
+			{
+				res.status(400).send("err");
+			}
+			else
+			{
+				res.status(200).json(users);
+			}
+		});
+	}
+	catch(error){
+		res.status(500)
+	}
+})
+
+//-------------------delete user -------------------------------
+
+// delete
+
+app.post('/delete/user', (req,res) => {
+	console.log("# delete user api");
+
+	User.findByIdAndDelete(req.body.id).exec((err,user)=> {
+		if(err)
+		{
+			res.status(400).send("err deleting user");
+		}
+		else
+		{
+			res.status(200).json({
+					success : true,
+					message : "user deleted from DB",
+					user_deleted : user
+				});
+		}
+
+	})
+
+
+})
+
+//----------------- view all todos ------------------------------
+app.get("/todos",async(req,res)=>{
+	try{
+		await Todo.find({}).populate("user").exec((err,todos)=> {
+			if(err)
+			{
+				res.status(400).send("err");
+			}
+			else
+			{
+				res.status(200).json(todos);
+			}
+		});
+	}
+	catch(error){
+		res.status(500)
+	}
+})
+
+
+// view specific user todo ---------------------------------------
+app.post("/user/todo",async(req,res)=>{
+	try{
+		await Todo.find({user : req.body.uid}).populate("user").exec((err,todos)=> {
+			if(err)
+			{
+				res.status(400).send("err");
+			}
+			else
+			{
+				res.status(200).json(todos);
+			}
+		});
 	}
 	catch(error){
 		res.status(500)
@@ -115,9 +173,100 @@ app.post("/users",async(req,res)=>{
 
 
 
+
+//----------------create todo -------------------
+
+app.post("/create/todo",async(req,res)=>{
+	try{
+
+		console.log("## adding todo api");
+
+		var todoobj = {
+			"_id" : new mongoose.Types.ObjectId(),
+			"title" : req.body.title,
+			"description" : req.body.des,
+			"user" : req.body.uid
+		}
+		var newTodo = new Todo(todoobj);
+
+		console.log(todoobj);
+
+		await newTodo.save((err, todo) => {
+			if(err)
+			{
+				res.status(400).send("err adding todo");
+			}
+			else
+			{
+				res.status(200).json(todo);
+			}
+		})
+	}
+	catch(error){
+		res.status(500)
+	}
+})
+
+
+//----------------------delete todo--------------------------
+
+app.post('/delete/todo', (req,res) => {
+	console.log("delete todo api");
+
+	Todo.findByIdAndDelete(req.body.tid).exec((err,todo)=> {
+		if(err)
+		{
+			res.status(400).send("err adding user");
+		}
+		else
+		{
+			res.status(200).json({
+					success : true,
+					message : "todo deleted from DB",
+					todo_deleted : todo
+				});
+		}
+
+	})
+
+})
+
+
+//--------------------update todo ------------------------------
+
+app.post('/update/todo', async(req,res) => {
+	console.log("## update api called");
+
+
+	var todoobj = {
+		"title" : req.body.title,
+		"description" : req.body.des,
+	}
+
+	await Todo.findByIdAndUpdate(req.body.tid,todoobj,{new :true}).exec((err,todo)=> {
+		if(err)
+		{
+			res.status(400).send("err adding user");
+		}
+		else
+		{
+			res.status(200).json({
+					success : true,
+					message : "todo updated",
+					todo_updated : todo
+				});
+		}
+
+	})
+
+
+})
+
+
+
 // Test api ----
 app.get("/",(req,res)=>{
-	res.send('<h1>Test API<h1>')
+	res.send('<h1>Test API Working ! LOL<h1>')
 })
 
 
@@ -129,5 +278,5 @@ const port = 3000;
 
 // -------------------------------------
 app.listen(port, () => {
-    console.log(`Server started on port ${port}`);
+    console.log("  # Node Server started on port "+ port);
 });
