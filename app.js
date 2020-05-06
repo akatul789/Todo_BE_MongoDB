@@ -1,50 +1,29 @@
 var express = require('express');
 var path = require("path");
-const expressHandlers = require("express-handlebars");
 var bodyparser = require("body-parser");
+var mongoose = require('mongoose');
+
 const cors = require('cors');
 
 
-var mongoose = require('mongoose');
 
 var app = express();
 
 app.use(bodyparser.json());
-
 app.use(bodyparser.urlencoded({ extended: false }));
 
 // app.use(bodyparser.urlencoded({ extended: true}));
 
 app.use(cors());
 
-// DB connect
-require("./model/index")
+// ###### DB connection ----------------
 
+require("./model/localDB")
+
+
+// importing models
 var Todo = require('./model/todo_model');
 var User = require('./model/user_model');
-//models
-// require("./model/Post")
-
-// require("./model/user_model");
-
-
-
-// const UserD = mongoose.model("UserData");
-// const TodoD = mongoose.model("TodoData");
-// const Post = mongoose.model("Post");
-
-// app.get("/posts",async(req,res)=>{
-// 	try{
-// 		const posts = await Post.find({})
-// 		res.send(posts)
-
-// 	}
-// 	catch(error){
-// 		res.status(500)
-// 	}
-// })
-
-
 
 //--------------------Create user API ------------------------
 
@@ -107,8 +86,6 @@ app.get("/users",async(req,res)=>{
 })
 
 //-------------------delete user -------------------------------
-
-// delete
 
 app.post('/delete/user', (req,res) => {
 	console.log("# delete user api");
@@ -263,7 +240,6 @@ app.post('/update/todo', async(req,res) => {
 })
 
 
-
 //---------------profile details api ------------------
 
 app.post("/profile_det",async(req,res)=>{
@@ -295,5 +271,5 @@ const port = 3000;
 
 // -------------------------------------
 app.listen(port, () => {
-    console.log("  # Node Server started on port "+ port);
+    console.log("  # Express Server started on port "+ port);
 });
