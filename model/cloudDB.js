@@ -1,6 +1,6 @@
 
 // URL ---
-// mongodb+srv://akatul789:<password>@cluster0-gndbx.mongodb.net/test?retryWrites=true&w=majority
+// mongodb+srv://akatul789:<password>@cluster0-gndbx.mongodb.net/Todo_mongo_test
 
 // pass - aks1019
 
@@ -8,9 +8,9 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb+srv://cluster0-gndbx.mongodb.net/test?retryWrites=true&w=majority/sample_test',
+mongoose.connect('mongodb+srv://cluster0-gndbx.mongodb.net/',
 {
-	dbName : 'sample_test',
+	dbName : 'Todo_mongo_test',
 	user : 'akatul789',
 	pass : 'aks1019',
 	useNewUrlParser :true,
