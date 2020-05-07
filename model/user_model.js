@@ -26,7 +26,7 @@ var userschema = new Schema({
 	}
 
 }, {
-    versionKey: false // Version key not required to removing that
+    versionKey: false // Version key not required so removing that
 });
 
 module.exports = mongoose.model('UserData',userschema);

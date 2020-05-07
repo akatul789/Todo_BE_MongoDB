@@ -17,10 +17,10 @@ app.use(cors());
 // ###### DB connection ----------------
 
 // ## localhost-----
-require("./model/localDB")
+// require("./model/localDB")
 
 // ## Mongodb atlas--------
-// require("./model/cloudDB")
+require("./model/cloudDB")
 
 
 // importing models
@@ -31,7 +31,7 @@ var User = require('./model/user_model');
 
 app.post("/create/user",async(req,res)=>{
 	try{
-		console.log(" ## Create user API called");
+		console.log("\n\t--## Create user API called");
 
 		var userobj = {
 			"_id" : new mongoose.Types.ObjectId(),
@@ -43,12 +43,12 @@ app.post("/create/user",async(req,res)=>{
 
 		var newUser = new User(userobj);
 
-		console.log(userobj);
+		// console.log(userobj);
 
 		await newUser.save((err, user) => {
 			if(err)
 			{
-				res.status(400).send("Error adding user");
+				res.status(400).send("Error adding user"+err);
 			}
 			else
 			{
@@ -71,6 +71,8 @@ app.post("/create/user",async(req,res)=>{
 
 app.get("/users",async(req,res)=>{
 	try{
+		console.log("\n\t--## View user API called");
+
 		await User.find({}).exec((err,users)=> {
 			if(err)
 			{
@@ -87,10 +89,11 @@ app.get("/users",async(req,res)=>{
 	}
 })
 
-//-------------------delete user -------------------------------
+//-------------------Delete user -------------------------------
 
 app.post('/delete/user', (req,res) => {
-	console.log("# delete user api");
+
+	console.log("\n\t--## Delete user API called");
 
 	User.findByIdAndDelete(req.body.id).exec((err,user)=> {
 		if(err)
@@ -111,8 +114,41 @@ app.post('/delete/user', (req,res) => {
 
 })
 
+//----------------create todo -------------------
+
+app.post("/create/todo",async(req,res)=>{
+	console.log("\n\t--## Create todo API called");
+	try{
+		var todoobj = {
+			"_id" : new mongoose.Types.ObjectId(),
+			"title" : req.body.title,
+			"description" : req.body.des,
+			"user" : req.body.uid
+		}
+		var newTodo = new Todo(todoobj);
+
+		// console.log(todoobj);
+
+		await newTodo.save((err, todo) => {
+			if(err)
+			{
+				res.status(400).send("err adding todo");
+			}
+			else
+			{
+				res.status(200).json(todo);
+			}
+		})
+	}
+	catch(error){
+		res.status(500)
+	}
+})
+
 //----------------- view all todos ------------------------------
 app.get("/todos",async(req,res)=>{
+	console.log("\n\t--## View todo API called");
+
 	try{
 		await Todo.find({}).populate("user").exec((err,todos)=> {
 			if(err)
@@ -133,6 +169,7 @@ app.get("/todos",async(req,res)=>{
 
 // view specific user todo ---------------------------------------
 app.post("/user/todo",async(req,res)=>{
+	console.log("\n\t--## View todo API called");
 	try{
 		await Todo.find({user : req.body.uid}).populate("user").exec((err,todos)=> {
 			if(err)
@@ -150,70 +187,10 @@ app.post("/user/todo",async(req,res)=>{
 	}
 })
 
-
-//----------------create todo -------------------
-
-app.post("/create/todo",async(req,res)=>{
-	try{
-
-		console.log("## adding todo api");
-
-		var todoobj = {
-			"_id" : new mongoose.Types.ObjectId(),
-			"title" : req.body.title,
-			"description" : req.body.des,
-			"user" : req.body.uid
-		}
-		var newTodo = new Todo(todoobj);
-
-		console.log(todoobj);
-
-		await newTodo.save((err, todo) => {
-			if(err)
-			{
-				res.status(400).send("err adding todo");
-			}
-			else
-			{
-				res.status(200).json(todo);
-			}
-		})
-	}
-	catch(error){
-		res.status(500)
-	}
-})
-
-
-//----------------------delete todo--------------------------
-
-app.post('/delete/todo',async (req,res) => {
-	console.log("delete todo api");
-
-	await Todo.findByIdAndDelete(req.body.tid).exec((err,todo)=> {
-		if(err)
-		{
-			res.status(400).send("err deleting user");
-		}
-		else
-		{
-			res.status(200).json({
-					success : true,
-					message : "todo deleted from DB",
-					deleted_todo : todo
-				});
-		}
-
-	})
-
-})
-
-
 //--------------------Update todo ------------------------------
 
 app.post('/update/todo', async(req,res) => {
-	console.log("## update api called");
-
+	console.log("\n\t--## Update todo API called");
 
 	var todoobj = {
 		"title" : req.body.title,
@@ -238,11 +215,34 @@ app.post('/update/todo', async(req,res) => {
 
 
 })
+//----------------------delete todo--------------------------
+
+app.post('/delete/todo',async (req,res) => {
+	console.log("\n\t--## Delete todo API called");
+
+	await Todo.findByIdAndDelete(req.body.tid).exec((err,todo)=> {
+		if(err)
+		{
+			res.status(400).send("err deleting user");
+		}
+		else
+		{
+			res.status(200).json({
+					success : true,
+					message : "todo deleted from DB",
+					deleted_todo : todo
+				});
+		}
+
+	})
+
+})
 
 
 //---------------profile details api ------------------
 
 app.post("/profile_det",async(req,res)=>{
+	console.log("\n\t--## Profile details API called");
 	try{
 		await User.findOne({_id : req.body.uid}).exec((err,user)=> {
 			if(err)
