@@ -10,7 +10,11 @@ var todoschema = new Schema({
 	description : {
 		type : String
 	},
-	status : {
+	completed : {
+		type : Boolean,
+		default : false
+	},
+	deleted : {
 		type : Boolean,
 		default : false
 	},
@@ -19,6 +23,8 @@ var todoschema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'UserData'
 	}
+}, {
+    versionKey: false // Version key not required to removing that
 });
 
 module.exports = mongoose.model('TodoData',todoschema);
