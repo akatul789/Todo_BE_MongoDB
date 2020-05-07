@@ -76,7 +76,7 @@ app.get("/users",async(req,res)=>{
 		await User.find({}).exec((err,users)=> {
 			if(err)
 			{
-				res.status(400).send("err");
+				res.status(400).send("error  "+err);
 			}
 			else
 			{
@@ -153,7 +153,7 @@ app.get("/todos",async(req,res)=>{
 		await Todo.find({}).populate("user").exec((err,todos)=> {
 			if(err)
 			{
-				res.status(400).send("err");
+				res.status(400).send("error  "+err);
 			}
 			else
 			{
@@ -174,7 +174,7 @@ app.post("/user/todo",async(req,res)=>{
 		await Todo.find({user : req.body.uid}).populate("user").exec((err,todos)=> {
 			if(err)
 			{
-				res.status(400).send("err");
+				res.status(400).send("error  "+err);
 			}
 			else
 			{
@@ -198,9 +198,9 @@ app.post('/update/todo', async(req,res) => {
 	}
 
 	await Todo.findByIdAndUpdate(req.body.tid,todoobj,{new :true}).exec((err,todo)=> {
-		if(err)
+		if(err || !todo)
 		{
-			res.status(400).send("err adding user");
+			res.status(400).send("error  "+err);
 		}
 		else
 		{
