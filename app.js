@@ -287,24 +287,85 @@ app.post('/update/todo', async(req,res) => {
 
 app.post('/delete/todo',async (req,res) => {
 	console.log("\n\t--## Delete todo API called");
+	var restore=req.body.restore;
+	var tempdel=req.body.tempdelete;
+	var perdel=req.body.perdelete;
 
-	await Todo.findByIdAndDelete(req.body.tid).exec((err,todo)=> {
-		if(err)
-		{
-			res.status(400).send("Error encoutered  "+err);
-			console.log("\t Error encoutered - "+err);
-		}
-		else
-		{
-			res.status(200).json({
-					success : true,
-					message : "todo deleted from DB",
-					deleted_todo : todo
-				});
-		}
+	var tid=req.body.tid;
+	if(!tid)
+	{
+		res.status(400).send(" tid value not passed !! ");
+		console.log("\t !! tid value not passed !!");
+		return;
+	}
 
-	})
+	if(restore && restore.toLowerCase().trim() == "yes")
+	{
 
+		await Todo.findByIdAndUpdate(tid,{deleted : false},{new :true}).exec((err,todo)=> {
+			if(err || !todo)
+			{
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
+			}
+			else
+			{
+				res.status(200).json({
+						success : true,
+						message : "todo updated",
+						todo_updated : todo
+					});
+				console.log("\t Todo restored");
+			}
+
+		})
+	}
+	else if(tempdel && tempdel.toLowerCase().trim() == "yes")
+	{
+
+		await Todo.findByIdAndUpdate(tid,{deleted : true},{new :true}).exec((err,todo)=> {
+			if(err || !todo)
+			{
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
+			}
+			else
+			{
+				res.status(200).json({
+						success : true,
+						message : "todo updated",
+						todo_updated : todo
+					});
+				console.log("\t Todo deleted temporary");
+			}
+
+		})
+	}
+	else if(perdel && perdel.toLowerCase().trim() == "yes")
+	{
+		await Todo.findByIdAndDelete(tid).exec((err,todo)=> {
+			if(err)
+			{
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
+			}
+			else
+			{
+				res.status(200).json({
+						success : true,
+						message : "todo deleted from DB",
+						deleted_todo : todo
+					});
+				console.log("\t Todo deleted !");
+			}
+
+		})
+	}
+	else
+	{
+		res.status(400).send("No value passed ");
+		console.log("\t No value passed ");
+	}
 })
 
 
