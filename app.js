@@ -16,11 +16,11 @@ app.use(cors());
 
 // ###### DB connection ----------------
 
-// ## localhost-----
+ // ## localhost-----
 // require("./model/localDB")
 
 // ## Mongodb atlas--------
-require("./model/cloudDB")
+require("./model/cloudDB");
 
 
 // importing models
@@ -186,6 +186,64 @@ app.post("/user/todo",async(req,res)=>{
 		res.status(500)
 	}
 })
+
+
+// Dashboard API -- normal - completed - deleted / ---------------------------------------
+app.post("/dashboard",async(req,res)=>{
+	console.log("\n\t--## Dashboard API called");
+
+	var check = req.body.type;
+	if(!check)
+	{
+		res.status(400).send(" Type of dashboard not passed !! ");
+		console.log("\t !! Type of dashboard not passed !!");
+		return;
+	}
+	
+	check=check.toLowerCase().trim();
+	if(check == "normal")// || check == "Normal" || check =="NORMAL")
+	{
+		console.log("\t =-= Normal Dashboard");
+		del = false;
+		comp = false;
+	}
+	else if(check == "deleted")
+	{
+		console.log("\t =-= Deleted Dashboard");
+		del = true;
+		comp = false;
+	}
+	else if(check == "completed")
+	{
+		console.log("\t =-= completed Dashboard");
+		del = false;
+		comp = true;
+	}
+	else
+	{
+		res.status(400).send(" Wrong Type value of dashboard passed !! try again ");
+		console.log("\t !!  Wrong Type value of dashboard passed !! try again");
+		return;
+	}
+	try{
+		await Todo.find({user : req.body.uid , deleted : del, completed : comp}).populate("user").exec((err,todos)=> {
+			if(err)
+			{
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
+			}
+			else
+			{
+				res.status(200).json(todos);
+			}
+		});
+	}
+	catch(error){
+		res.status(500)
+	}
+})
+
+
 
 //--------------------Update todo ------------------------------
 
