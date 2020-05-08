@@ -48,7 +48,8 @@ app.post("/create/user",async(req,res)=>{
 		await newUser.save((err, user) => {
 			if(err)
 			{
-				res.status(400).send("Error adding user"+err);
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
 			}
 			else
 			{
@@ -56,7 +57,7 @@ app.post("/create/user",async(req,res)=>{
 				res.status(200).json({
 					success : true,
 					message : "user added to DB",
-					user_det : user
+					user_details : user
 				});
 			}
 		})
@@ -76,7 +77,8 @@ app.get("/users",async(req,res)=>{
 		await User.find({}).exec((err,users)=> {
 			if(err)
 			{
-				res.status(400).send("error  "+err);
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
 			}
 			else
 			{
@@ -98,7 +100,8 @@ app.post('/delete/user', (req,res) => {
 	User.findByIdAndDelete(req.body.id).exec((err,user)=> {
 		if(err)
 		{
-			res.status(400).send("err deleting user");
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
 		}
 		else
 		{
@@ -132,11 +135,16 @@ app.post("/create/todo",async(req,res)=>{
 		await newTodo.save((err, todo) => {
 			if(err)
 			{
-				res.status(400).send("err adding todo");
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
 			}
 			else
 			{
-				res.status(200).json(todo);
+				res.status(200).json({
+					success : true,
+					message : "todo added",
+					todo_details :todo
+				});
 			}
 		})
 	}
@@ -153,7 +161,8 @@ app.get("/todos",async(req,res)=>{
 		await Todo.find({}).populate("user").exec((err,todos)=> {
 			if(err)
 			{
-				res.status(400).send("error  "+err);
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
 			}
 			else
 			{
@@ -168,24 +177,24 @@ app.get("/todos",async(req,res)=>{
 
 
 // view specific user todo ---------------------------------------
-app.post("/user/todo",async(req,res)=>{
-	console.log("\n\t--## View todo API called");
-	try{
-		await Todo.find({user : req.body.uid}).populate("user").exec((err,todos)=> {
-			if(err)
-			{
-				res.status(400).send("error  "+err);
-			}
-			else
-			{
-				res.status(200).json(todos);
-			}
-		});
-	}
-	catch(error){
-		res.status(500)
-	}
-})
+// app.post("/user/todo",async(req,res)=>{
+// 	console.log("\n\t--## View todo API called");
+// 	try{
+// 		await Todo.find({user : req.body.uid}).populate("user").exec((err,todos)=> {
+// 			if(err)
+// 			{
+// 				res.status(400).send("error  "+err);
+// 			}
+// 			else
+// 			{
+// 				res.status(200).json(todos);
+// 			}
+// 		});
+// 	}
+// 	catch(error){
+// 		res.status(500)
+// 	}
+// })
 
 
 // Dashboard API -- normal - completed - deleted / ---------------------------------------
@@ -258,7 +267,8 @@ app.post('/update/todo', async(req,res) => {
 	await Todo.findByIdAndUpdate(req.body.tid,todoobj,{new :true}).exec((err,todo)=> {
 		if(err || !todo)
 		{
-			res.status(400).send("error  "+err);
+			res.status(400).send("Error encoutered  "+err);
+			console.log("\t Error encoutered - "+err);
 		}
 		else
 		{
@@ -281,7 +291,8 @@ app.post('/delete/todo',async (req,res) => {
 	await Todo.findByIdAndDelete(req.body.tid).exec((err,todo)=> {
 		if(err)
 		{
-			res.status(400).send("err deleting user");
+			res.status(400).send("Error encoutered  "+err);
+			console.log("\t Error encoutered - "+err);
 		}
 		else
 		{
@@ -305,7 +316,8 @@ app.post("/profile_det",async(req,res)=>{
 		await User.findOne({_id : req.body.uid}).exec((err,user)=> {
 			if(err)
 			{
-				res.status(400).send("Error.. cannot find user");
+				res.status(400).send("Error encoutered can't find user "+err);
+				console.log("\t Error encoutered - "+err);
 			}
 			else
 			{
