@@ -312,7 +312,7 @@ app.post('/delete/todo',async (req,res) => {
 			{
 				res.status(200).json({
 						success : true,
-						message : "todo updated",
+						message : "todo restored",
 						todo_updated : todo
 					});
 				console.log("\t Todo restored");
@@ -333,7 +333,7 @@ app.post('/delete/todo',async (req,res) => {
 			{
 				res.status(200).json({
 						success : true,
-						message : "todo updated",
+						message : "todo deleted temporary",
 						todo_updated : todo
 					});
 				console.log("\t Todo deleted temporary");
@@ -357,6 +357,70 @@ app.post('/delete/todo',async (req,res) => {
 						deleted_todo : todo
 					});
 				console.log("\t Todo deleted !");
+			}
+
+		})
+	}
+	else
+	{
+		res.status(400).send("No value passed ");
+		console.log("\t No value passed ");
+	}
+})
+
+//----------------------completed todo--------------------------
+
+app.post('/comp/todo',async (req,res) => {
+	console.log("\n\t--## complete todo API called");
+	var restore=req.body.restore;
+	var completed=req.body.completed;
+
+	var tid=req.body.tid;
+	if(!tid)
+	{
+		res.status(400).send(" tid value not passed !! ");
+		console.log("\t !! tid value not passed !!");
+		return;
+	}
+
+	if(restore && restore.toLowerCase().trim() == "yes")
+	{
+
+		await Todo.findByIdAndUpdate(tid,{completed : false},{new :true}).exec((err,todo)=> {
+			if(err || !todo)
+			{
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
+			}
+			else
+			{
+				res.status(200).json({
+						success : true,
+						message : "todo restored",
+						todo_updated : todo
+					});
+				console.log("\t Todo restored");
+			}
+
+		})
+	}
+	else if(completed && completed.toLowerCase().trim() == "yes")
+	{
+
+		await Todo.findByIdAndUpdate(tid,{completed : true},{new :true}).exec((err,todo)=> {
+			if(err || !todo)
+			{
+				res.status(400).send("Error encoutered  "+err);
+				console.log("\t Error encoutered - "+err);
+			}
+			else
+			{
+				res.status(200).json({
+						success : true,
+						message : "todo completed",
+						todo_updated : todo
+					});
+				console.log("\t Todo completed");
 			}
 
 		})
